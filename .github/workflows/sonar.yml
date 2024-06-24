@@ -1,31 +1,27 @@
-name: SonarQube Scan
+name: Build
 
 on:
   push:
     branches:
       - main
 
+
 jobs:
-  sonarqube_scan:
+  build:
+    name: Build and analyze
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@v2.2
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          sonar-host-url: http://localhost:9000
-          sonar-login: ${{ secrets.SONAR_TOKEN }}
-          sonar-project-key: ayush-drupal
-          sonar-sources: web/modules/  # Adjust path to your Drupal module directory
-          
-      - name: Upload SonarQube results
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: sonarqube-report
-          path: .scannerwork/report-task.txt
+          SONAR_HOST_URL: http://localhost:9000
+      # If you wish to fail your job when the Quality Gate is red, uncomment the
+      # following lines. This would typically be used to fail a deployment.
+      # - uses: sonarsource/sonarqube-quality-gate-action@master
+      #   timeout-minutes: 5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
