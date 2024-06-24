@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   sonarqube_scan:
     runs-on: ubuntu-latest
@@ -14,14 +15,13 @@ jobs:
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@v2.2
-        run: |
-          sonar-scanner \
-            -Dsonar.host.url=http://localhost:9000 \
-            -Dsonar.login=$SONAR_TOKEN \
-            -Dsonar.projectKey=ayush-drupal \
-            -Dsonar.sources=web/modules/  # Adjust path to your Drupal module directory
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          sonar-host-url: http://localhost:9000
+          sonar-login: ${{ secrets.SONAR_TOKEN }}
+          sonar-project-key: ayush-drupal
+          sonar-sources: web/modules/  # Adjust path to your Drupal module directory
           
       - name: Upload SonarQube results
         if: ${{ always() }}
